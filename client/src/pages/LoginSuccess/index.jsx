@@ -3,7 +3,7 @@ import React from "react";
 import styles from "./styles.module.scss";
 import Header from "../../components/Header";
 import { useSelector } from "react-redux";
-import { selectLoggedInUser } from "../../redux/users/usersSlice";
+import { selectLoggedInUser } from "../../redux/auth/authSlice";
 
 const LoginSuccess = () => {
   const loggedInUser = useSelector(selectLoggedInUser)

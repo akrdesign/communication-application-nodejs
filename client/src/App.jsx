@@ -13,6 +13,9 @@ import ManageDocuments from "./pages/ManageDocuments";
 import EditUser from "./pages/EditUser";
 import NotFound from "./pages/NotFound";
 import DocumentShare from "./pages/DocumentShare";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { verifyUserAsync } from "./redux/auth/authSlice";
 
 const router = createBrowserRouter([
   {
@@ -90,6 +93,12 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  // const dispatch = useDispatch()
+
+  // useEffect(() => {
+  //   dispatch(verifyUserAsync())
+  // }, [dispatch])
+
   return (
     <>
       <RouterProvider router={router} />

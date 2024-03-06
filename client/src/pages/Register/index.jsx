@@ -10,6 +10,7 @@ import Button from "../../components/common/Button";
 import { emailRegex } from "../../utils/index";
 
 import styles from "./styles.module.scss";
+import { createUserAsync, selectAuthErrors } from "../../redux/auth/authSlice";
 
 const Register = () => {
   const [fullName, setFullName] = useState("");
@@ -17,10 +18,34 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const navigate = useNavigate();
 
-  const dispatch = useDispatch()
-  const users = useSelector(allUsers)
+  const dispatch = useDispatch();
+  const users = useSelector(allUsers);
+  const authError = useSelector(selectAuthErrors);
+
+  useEffect(() => {
+    // Check for authError changes
+    console.log("authError", authError);
+    if (authError) {
+      // Update the local state errors to display error messages
+      setErrors({
+        fullName: authError.fullname || "",
+        email: authError.email || "",
+        password: authError.password || "",
+      });
+    } else {
+      // Reset the local state errors if there are no auth errors
+      setErrors({});
+
+      // Check if the form was successfully submitted and navigate
+      if (formSubmitted) {
+        sessionStorage.setItem("isRegistered", true);
+        navigate("/auth/register-success", { replace: true });
+      }
+    }
+  }, [authError]); 
 
   const validateForm = () => {
     const errors = {};
@@ -33,13 +58,6 @@ const Register = () => {
     // Validate email
     if (!email.trim() || !emailRegex.test(email)) {
       errors.email = "Invalid email address";
-    } else {
-      // Check if email is already registered
-      const isEmailRegistered = users.some((user) => user.email === email);
-
-      if (isEmailRegistered) {
-        errors.email = "This email is already registered";
-      }
     }
 
     // Validate password
@@ -56,21 +74,21 @@ const Register = () => {
     return errors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formErrors = validateForm();
+    console.log(formErrors);
 
     if (Object.keys(formErrors).length === 0) {
       const userObj = {
         id: uuidv4(),
-        fullName,
+        fullname: fullName,
         email,
         password,
       };
 
-      dispatch(addUser(userObj))
-      sessionStorage.setItem("isRegistered", true);
-      navigate("/auth/register-success", { replace: true });
+      dispatch(createUserAsync(userObj));
+      setFormSubmitted(true);
     }
   };
 
@@ -91,7 +109,7 @@ const Register = () => {
         />
 
         <Input
-          type="email"
+          type="text"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           id="email"

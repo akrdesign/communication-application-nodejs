@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./styles.module.scss";
 import { useDispatch } from "react-redux";
 import { logout } from "../../redux/users/usersSlice";
+import { logoutUserAsync } from "../../redux/auth/authSlice";
 
 // Navigation Menu Data
 const navigation = [
@@ -31,7 +32,7 @@ const Header = () => {
   
   // Logout handler
   const handleLogoutClick = () => {
-    dispatch(logout())
+    dispatch(logoutUserAsync())
     
     // navigate("/welcome")
   };

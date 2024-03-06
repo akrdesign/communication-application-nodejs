@@ -7,8 +7,9 @@ import styles from "./styles.module.scss";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import { useDispatch, useSelector } from "react-redux";
-import { allUsers, selectLoggedInUser } from "../../redux/users/usersSlice";
+import { allUsers } from "../../redux/users/usersSlice";
 import { addChat, fetchAllChats } from "../../redux/chats/chatsSlice";
+import { selectLoggedInUser } from "../../redux/auth/authSlice";
 
 const GroupChats = () => {
   const dispatch = useDispatch();
@@ -68,7 +69,7 @@ const GroupChats = () => {
             onChange={(e) => setMessage(e.target.value)}
             id="message"
             name="message"
-            label={currentUser.fullName}
+            label={loggedInUser?.fullname}
             className={styles.input}
             autoComplete="off"
           />

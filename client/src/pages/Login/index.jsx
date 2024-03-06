@@ -7,13 +7,14 @@ import Button from "../../components/common/Button";
 
 import styles from "./styles.module.scss";
 import { useDispatch, useSelector } from "react-redux";
-import { checkUser, getUsersError, selectLoggedInUser } from "../../redux/users/usersSlice";
+import { checkUser, getUsersError } from "../../redux/users/usersSlice";
+import { checkUserAsync, selectAuthErrors, selectLoggedInUser } from "../../redux/auth/authSlice";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  const loginError = useSelector(getUsersError);
+  const loginError = useSelector(selectAuthErrors);
   const loggedInUser = useSelector(selectLoggedInUser);
   const dispatch = useDispatch();
 
@@ -25,11 +26,6 @@ const Login = () => {
       errors.email = "Invalid email address";
     }
 
-    // Validate password
-    if (password.length < 6) {
-      errors.password = "Password must be at least 6 characters";
-    }
-
     setErrors(errors);
     return errors;
   };
@@ -39,7 +35,7 @@ const Login = () => {
     const formErrors = validateForm();
 
     if (Object.keys(formErrors).length === 0) {
-      dispatch(checkUser({email, password}))
+      dispatch(checkUserAsync({email, password}))
     }
   };
 
@@ -70,7 +66,6 @@ const Login = () => {
             label="Password"
             required={true}
             className={styles.inputs__wrapper}
-            error={errors.password}
           />
           {loginError && <p className={styles.error}>{loginError}</p>}
           <Button type="submit">Login</Button>
