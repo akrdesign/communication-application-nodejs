@@ -1,42 +1,81 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { deleteUser, fetchUserById, fetchUsers, updateUser } from "./userAPI";
 
 const initialState = {
   users: [],
-  loggedInUser: null,
-  error: ""
+  fetchedUser: {},
+  error: null,
+  status: "idle",
 };
+
+export const fetchUsersAsync = createAsyncThunk(
+  "user/fetchUsers", async () => {
+  const response = await fetchUsers();
+  return response;
+});
+
+export const fetchUserByIdAsync = createAsyncThunk(
+  "user/fetchUserById", async (id) => {
+  const response = await fetchUserById(id);
+  return response;
+});
+
+export const updateUserAsync = createAsyncThunk(
+  "user/updateUser", async (user) => {
+  const response = await updateUser(user);
+  return response;
+});
+
+export const deleteUserAsync = createAsyncThunk(
+  "user/deleteUser", async (id) => {
+  const response = await deleteUser(id);
+  return response;
+});
 
 export const userSlice = createSlice({
   name: "users",
   initialState,
-  reducers: {
-    addUser: (state, action) => {
-      state.users.push(action.payload);
-    },
-    checkUser: (state, action) => {
-      const { email, password } = action.payload;
-      const user = state.users.find((u) => u.email === email && u.password === password);
-      user ? state.loggedInUser = user : state.error = "Invalid email or password"
-      if(state.loggedInUser) state.error = null;
-    },
-    logout: (state) => {
-      state.loggedInUser = null;
-    },
-    updateUser: (state, action) => {
-      const index = state.users.findIndex((u) => u.id === action.payload.id);
+  extraReducers: (builder) => {
+    builder
+    .addCase(fetchUsersAsync.pending, (state) => {
+      state.status = "loading"
+    })
+    .addCase(fetchUsersAsync.fulfilled, (state, action) => {
+      state.status = "idle"
+      state.users = action.payload
+    })
+    .addCase(fetchUserByIdAsync.pending, (state) => {
+      state.status = "loading"
+    })
+    .addCase(fetchUserByIdAsync.fulfilled, (state, action) => {
+      state.status = "idle"
+      state.fetchedUser = action.payload
+    })
+    .addCase(updateUserAsync.pending, (state) => {
+      state.status = "loading"
+    })
+    .addCase(updateUserAsync.fulfilled, (state, action) => {
+      state.status = "idle"
+      const index = state.users.findIndex(
+        (u) => u.id === action.payload.id
+      );
       state.users[index] = action.payload;
-      state.loggedInUser = action.payload;
-    },
-    deleteUser: (state, action) => {
+    })
+    .addCase(deleteUserAsync.pending, (state) => {
+      state.status = "loading"
+    })
+    .addCase(deleteUserAsync.fulfilled, (state, action) => {
+      console.log("action", action)
+      state.status = "idle"
       const index = state.users.findIndex((u) => u.id === action.payload.id);
       state.users.splice(index, 1);
-    },
-  },
+    })
+  }
 });
 
-export const { addUser, checkUser, logout, updateUser, deleteUser } = userSlice.actions;
-export const selectLoggedInUser = (state) => state.users.loggedInUser;
+export const selectLoggedInUser = (state) => state.user.loggedInUser;
 export const allUsers = (state) => state.users.users;
+export const getFetchedUser = (state) => state.users.fetchedUser;
 export const getUsersError = (state) => state.users.error;
 
 export default userSlice.reducer;

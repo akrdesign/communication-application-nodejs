@@ -8,31 +8,37 @@ import Button from "../../components/common/Button";
 import styles from "./styles.module.scss";
 import { emailRegex } from "../../utils/index";
 import { useDispatch, useSelector } from "react-redux";
-import { allUsers, updateUser } from "../../redux/users/usersSlice";
+import {
+  fetchUserByIdAsync,
+  getFetchedUser,
+  updateUserAsync,
+} from "../../redux/users/usersSlice";
 
 const EditUser = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const users = useSelector(allUsers);
+  const fetchedUser = useSelector(getFetchedUser);
   const dispatch = useDispatch();
-  
+
   const [user, setUser] = useState(null);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState({});
-  
-  useEffect(() => {
-    const fetchedUser = users.find((u) => u.id === id);
 
+  useEffect(() => {
+    dispatch(fetchUserByIdAsync(id));
+  }, [dispatch, id]);
+
+  useEffect(() => {
     if (fetchedUser) {
       setUser(fetchedUser);
-      setFullName(fetchedUser.fullName);
+      setFullName(fetchedUser.fullname);
       setEmail(fetchedUser.email);
     } else {
       // User not found
       navigate("/*");
     }
-  }, []);
+  }, [fetchedUser]);
 
   const validateForm = () => {
     let error = {};
@@ -55,7 +61,7 @@ const EditUser = () => {
     const formErrors = validateForm();
 
     if (Object.keys(formErrors).length === 0) {
-      dispatch(updateUser({...user, fullName, email}))
+      dispatch(updateUserAsync({ id: user.id, fullname: fullName, email }))
       navigate("/manage-users");
     }
   };
@@ -81,7 +87,7 @@ const EditUser = () => {
             type="email"
             value={email}
             onChange={(e) => {
-              setEmail(e.target.value)
+              setEmail(e.target.value);
             }}
             id="email"
             name="email"

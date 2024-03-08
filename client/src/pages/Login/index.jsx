@@ -7,7 +7,6 @@ import Button from "../../components/common/Button";
 
 import styles from "./styles.module.scss";
 import { useDispatch, useSelector } from "react-redux";
-import { checkUser, getUsersError } from "../../redux/users/usersSlice";
 import { checkUserAsync, selectAuthErrors, selectLoggedInUser } from "../../redux/auth/authSlice";
 
 const Login = () => {

@@ -2,7 +2,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors")
 const cookieParser = require('cookie-parser')
-const authRouter = require("./routes/auth")
+
+const authRouter = require("./routes/auth");
+const userRouter = require("./routes/user");
 
 const PORT = process.env.PORT || 8080
 
@@ -14,10 +16,11 @@ var corsOptions = {
   optionsSuccessStatus: 200 // For legacy browser support
 }
 
-server.use(cors(corsOptions))
-server.use(express.json())
-server.use(cookieParser())
-server.use("/auth", authRouter.router)
+server.use(cors(corsOptions));
+server.use(express.json());
+server.use(cookieParser());
+server.use("/auth", authRouter.router);
+server.use("/users", userRouter.router);
 
 main().catch((err) => console.log(err));
 

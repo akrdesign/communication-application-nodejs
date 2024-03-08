@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 import Header from "../../components/Header";
 import ModalComponent from "../../components/ModalComponent";
 
 import styles from "./styles.module.scss";
-import { useDispatch, useSelector } from "react-redux";
-import { allUsers, deleteUser, selectLoggedInUser } from "../../redux/users/usersSlice";
+import { allUsers, deleteUserAsync } from "../../redux/users/usersSlice";
+import { selectLoggedInUser } from "../../redux/auth/authSlice";
 
 const ModalBody = () => {
   return <h4>Are you sure?</h4>;
@@ -21,7 +22,7 @@ const ManageUsers = () => {
   const currentUser = users.find((u) => u.id === loggedInUser.id);
 
   const handleDelete = () => {
-    dispatch(deleteUser(selectedUser));
+    dispatch(deleteUserAsync(selectedUser));
     setSelectedUser(null);
   };
 
@@ -49,7 +50,7 @@ const ManageUsers = () => {
             {users.map((user) => {
               return (
                 <tr key={user.email}>
-                  <td>{user.fullName}</td>
+                  <td>{user.fullname}</td>
                   <td className={styles.email}>{user.email}</td>
                   <td>
                     <span className={styles.button}>

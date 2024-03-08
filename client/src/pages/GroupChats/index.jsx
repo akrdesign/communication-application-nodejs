@@ -37,7 +37,7 @@ const GroupChats = () => {
       const chat = {
         id: uuidv4(),
         date: currentDateTime,
-        user: currentUser.fullName,
+        user: currentUser.fullname,
         message: message,
       };
       dispatch(addChat(chat));
@@ -69,7 +69,7 @@ const GroupChats = () => {
             onChange={(e) => setMessage(e.target.value)}
             id="message"
             name="message"
-            label={loggedInUser?.fullname}
+            label={currentUser?.fullname}
             className={styles.input}
             autoComplete="off"
           />

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { useDispatch, useSelector } from "react-redux";
 
-import { addUser, allUsers } from "../../redux/users/usersSlice";
+import { allUsers } from "../../redux/users/usersSlice";
 
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
