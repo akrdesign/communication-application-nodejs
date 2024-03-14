@@ -13,6 +13,11 @@ import ManageDocuments from "./pages/ManageDocuments";
 import EditUser from "./pages/EditUser";
 import NotFound from "./pages/NotFound";
 import DocumentShare from "./pages/DocumentShare";
+import { useDispatch, useSelector } from "react-redux";
+import { selectLoggedInUser } from "./redux/auth/authSlice";
+import { useEffect } from "react";
+import { getSharedUploads } from "./redux/uploads/uploadsSlice";
+import { fetchUploadsByUserAsync } from "./redux/users/usersSlice";
 
 const router = createBrowserRouter([
   {
@@ -90,6 +95,14 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  // const dispatch = useDispatch();
+  // const user = useSelector(selectLoggedInUser);
+
+  // useEffect(()=>{
+  //   if(user){
+  //     dispatch(fetchUploadsByUserAsync(user.id))
+  //   }
+  // },[dispatch, user])
   return (
     <>
       <RouterProvider router={router} />

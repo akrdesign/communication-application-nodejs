@@ -9,11 +9,16 @@ import ModalComponent from "../../components/ModalComponent";
 
 import styles from "./styles.module.scss";
 import { useDispatch, useSelector } from "react-redux";
-import { allUsers, selectLoggedInUser } from "../../redux/users/usersSlice";
+import { allUsers } from "../../redux/users/usersSlice";
 import {
   addShareUpload,
+  createSharedUploadAsync,
+  deleteSharedUploadAsync,
   fetchAllUploads,
+  fetchSharedUploadsAsync,
+  getSharedUploads,
 } from "../../redux/uploads/uploadsSlice";
+import { selectLoggedInUser } from "../../redux/auth/authSlice";
 
 const ModalBody = () => {
   return <h4>Are you sure?</h4>;
@@ -25,6 +30,7 @@ const DocumentShare = () => {
   const dispatch = useDispatch();
   const users = useSelector(allUsers);
   const loggedInUser = useSelector(selectLoggedInUser);
+  const sharedUploads = useSelector(getSharedUploads);
 
   const [selectedUser, setSelectedUser] = useState("");
   const uploads = useSelector(fetchAllUploads);
@@ -32,11 +38,18 @@ const DocumentShare = () => {
   const [removedUser, setRemovedUser] = useState(null);
   const [errors, setErrors] = useState({});
 
+  
+  const currentSharedUploads = sharedUploads.filter((u) => u.items?.id === id)
+
   useEffect(() => {
     if (!upload) {
       navigate("/*");
     }
   }, [upload, navigate]);
+
+  useEffect(() => {
+    dispatch(fetchSharedUploadsAsync())
+  }, [dispatch])
 
   const removeUserHandler = () => {
     const updatedUploads = uploads.map((u) => {
@@ -50,7 +63,7 @@ const DocumentShare = () => {
       return u;
     });
 
-    dispatch(addShareUpload(updatedUploads));
+    dispatch(deleteSharedUploadAsync({id: removedUser}));
     setRemovedUser(null);
   };
 
@@ -77,41 +90,19 @@ const DocumentShare = () => {
     const formErrors = validation();
 
     if (Object.keys(formErrors).length === 0) {
-      const [selectedFullName, selectedEmail] = selectedUser.split(",");
+      const [selectedId, selectedFullName, selectedEmail] = selectedUser.split(",");
 
-      const isUserAlreadyShared = upload?.shared.some(
-        (share) => share.user === selectedFullName
-      );
+      const u = {
+        items: upload,
+        user: selectedId,
+        username: selectedFullName,
+        sharedBy: loggedInUser.email,
+        sharedTo: selectedEmail,
+      };
 
-      if (isUserAlreadyShared) {
-        const error = {
-          selectedUser: "File already shared with this user!",
-        };
-        setErrors(error);
-      } else {
-        const updatedUploads = uploads.map((u) => {
-          if (u.id === id) {
-            const updatedUpload = { ...u };
-            updatedUpload.shared = [
-              ...updatedUpload.shared,
-              {
-                id: uuidv4(),
-                user: selectedFullName,
-                sharedBy: loggedInUser.email,
-                sharedTo: selectedEmail,
-                description: upload.description,
-                file: upload.file,
-              },
-            ];
-            return updatedUpload;
-          }
-          return u;
-        });
-
-        dispatch(addShareUpload(updatedUploads));
-        setSelectedUser("");
-        setErrors({});
-      }
+      dispatch(createSharedUploadAsync(u));
+      setSelectedUser("");
+      setErrors({});
     }
   };
 
@@ -120,7 +111,7 @@ const DocumentShare = () => {
       <Header />
       <div className={styles.container}>
         <h2>Upload sharing: {upload.description}</h2>
-        {upload?.shared && upload?.shared.length > 0 ? (
+        {currentSharedUploads.length > 0 ? (
           <table>
             <thead>
               <tr>
@@ -129,10 +120,10 @@ const DocumentShare = () => {
               </tr>
             </thead>
             <tbody>
-              {upload?.shared.map((share) => {
+              {currentSharedUploads.map((share) => {
                 return (
                   <tr key={share.id}>
-                    <td>{share.user}</td>
+                    <td>{share.username}</td>
                     <td>
                       <span
                         className={styles.button}
@@ -166,10 +157,10 @@ const DocumentShare = () => {
                   return (
                     <option
                       key={user.id}
-                      value={`${user.fullName},${user.email}`}
+                      value={`${user.id},${user.fullname},${user.email}`}
                       className="text-capitalize"
                     >
-                      {user.fullName}
+                      {user.fullname}
                     </option>
                   );
                 }

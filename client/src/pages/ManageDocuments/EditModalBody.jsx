@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllUploads, updateUpload } from "../../redux/uploads/uploadsSlice";
+import { fetchAllUploads, updateUploadAsync } from "../../redux/uploads/uploadsSlice";
 
 const EditModalBody = ({
   closeEditModalHandler,
@@ -36,7 +36,7 @@ const EditModalBody = ({
 
     if (Object.keys(formErrors).length === 0) {
       if (uploadIndex !== -1) {
-        dispatch(updateUpload({description, uploadIndex}))
+        dispatch(updateUploadAsync({ id: selectedUpload, description }))
 
         // Close the modal
         closeEditModalHandler();

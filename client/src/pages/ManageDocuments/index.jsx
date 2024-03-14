@@ -9,11 +9,14 @@ import { Link } from "react-router-dom";
 import UploadModalBody from "./UploadModalBody";
 import EditModalBody from "./EditModalBody";
 import { useDispatch, useSelector } from "react-redux";
-import { selectLoggedInUser } from "../../redux/users/usersSlice";
 import {
-  deleteUpload,
+  deleteUploadAsync,
   fetchAllUploads,
+  fetchUploadsAsync,
+  resetFetchedUpload,
 } from "../../redux/uploads/uploadsSlice";
+import { selectLoggedInUser } from "../../redux/auth/authSlice";
+import { fetchUploadsByUserAsync, getUsersUploads } from "../../redux/users/usersSlice";
 
 const DeleteModalBody = () => {
   return <h4>Are you sure?</h4>;
@@ -22,6 +25,8 @@ const DeleteModalBody = () => {
 const ManageDocuments = () => {
   const loggedInUser = useSelector(selectLoggedInUser);
   const uploads = useSelector(fetchAllUploads);
+  const usersUploads = useSelector(getUsersUploads);
+
   const [openUploadModal, setOpenUploadModal] = useState(false);
   const [selectedUpload, setSelectedUpload] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -30,22 +35,32 @@ const ManageDocuments = () => {
     useState([]);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(fetchUploadsAsync())
+  }, [dispatch])
+
+  useEffect(()=>{
+    if(loggedInUser){
+      dispatch(fetchUploadsByUserAsync(loggedInUser.id))
+    }
+  },[dispatch, loggedInUser])
+
   const loggedInUserEmail = loggedInUser.email;
 
   useEffect(() => {
     const sharedUploads = uploads.filter((upload) =>
-      upload.shared.some((share) => share.sharedTo === loggedInUserEmail)
+      upload.shared.some((share) => share?.sharedTo === loggedInUserEmail)
     );
 
     const updatedSharedUploads = sharedUploads.map((shared) =>
-      shared.shared.find((share) => share.sharedTo === loggedInUserEmail)
+      shared.shared.find((share) => share?.sharedTo === loggedInUserEmail)
     );
 
     setSharedUploadsForCurrentUser(updatedSharedUploads);
   }, [uploads, loggedInUserEmail]);
 
   const handleDelete = () => {
-    dispatch(deleteUpload({ id: selectedUpload }));
+    dispatch(deleteUploadAsync({ id: selectedUpload }));
     setSelectedUpload(null);
     setOpenDeleteModal(false);
   };
@@ -68,6 +83,7 @@ const ManageDocuments = () => {
   const closeEditModalHandler = () => {
     setSelectedUpload(null);
     setOpenEditModal(false);
+    dispatch(resetFetchedUpload())
   };
 
   return (
@@ -119,7 +135,7 @@ const ManageDocuments = () => {
         )}
 
         <h2 className="mt-5">Shared uploads</h2>
-        {sharedUploadsForCurrentUser.length > 0 ? (
+        {usersUploads.length > 0 ? (
           <table>
             <thead>
               <tr>
@@ -129,11 +145,11 @@ const ManageDocuments = () => {
               </tr>
             </thead>
             <tbody>
-              {sharedUploadsForCurrentUser.map((upload) => {
+              {usersUploads.map((upload) => {
                 return (
                   <tr key={upload.id}>
-                    <td>{upload.description}</td>
-                    <td>{upload.file}</td>
+                    <td>{upload.items.description}</td>
+                    <td>{upload.items.file}</td>
                     <td className={styles.email}>{upload.sharedBy}</td>
                   </tr>
                 );

@@ -8,7 +8,7 @@ import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { allUsers } from "../../redux/users/usersSlice";
-import { addChat, fetchAllChats } from "../../redux/chats/chatsSlice";
+import { createChatAsync, fetchAllChats, fetchChatsAsync } from "../../redux/chats/chatsSlice";
 import { selectLoggedInUser } from "../../redux/auth/authSlice";
 
 const GroupChats = () => {
@@ -19,6 +19,10 @@ const GroupChats = () => {
   const [message, setMessage] = useState("");
 
   const currentUser = users.find((u) => u.id === loggedInUser.id);
+
+  useEffect(() => {
+    dispatch(fetchChatsAsync())
+  }, [dispatch])
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -37,10 +41,10 @@ const GroupChats = () => {
       const chat = {
         id: uuidv4(),
         date: currentDateTime,
-        user: currentUser.fullname,
+        username: currentUser.fullname,
         message: message,
       };
-      dispatch(addChat(chat));
+      dispatch(createChatAsync(chat));
       setMessage("");
     }
   };
@@ -56,7 +60,7 @@ const GroupChats = () => {
             chats.map((chat) => (
               <li key={chat.id}>
                 <span>[{chat.date}] </span>
-                <span>{chat.user} : </span>
+                <span>{chat.username} : </span>
                 <span>{chat.message}</span>
               </li>
             ))}

@@ -18,6 +18,15 @@ export const fetchUserById = async (id) => {
   }
 };
 
+export const fetchUploadsByUser = async (userId) => {
+  try {
+    const response = await BaseAPI.get("shareduploads/user/"+userId);
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
+
 export const updateUser = async (user) => {
   try {
     const response = await BaseAPI.patch("/users/"+user.id, user);
@@ -35,17 +44,3 @@ export const deleteUser = async (id) => {
     return error.response;
   }
 };
-
-
-
-// export function updateOrder(order) {
-//   return new Promise(async (resolve) => {
-//     const response = await fetch('http://localhost:8080/orders/'+order.id, {
-//       method: 'PATCH',
-//       body: JSON.stringify(order),
-//       headers: { 'content-type': 'application/json' },
-//     });
-//     const data = await response.json();
-//     resolve({ data });
-//   });
-// }

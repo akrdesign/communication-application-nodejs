@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import { useDispatch } from "react-redux";
-import { addUploads } from "../../redux/uploads/uploadsSlice";
+import { createUploadAsync } from "../../redux/uploads/uploadsSlice";
 
 const UploadModalBody = ({ setOpenUploadModal }) => {
   const [description, setDescription] = useState("");
@@ -33,14 +33,13 @@ const UploadModalBody = ({ setOpenUploadModal }) => {
     const formErrors = validateForm();
 
     if (Object.keys(formErrors).length === 0) {
-      const upload = {
-        id: uuidv4(),
-        description,
-        file: file.name,
-        shared: [],
-      };
+      const shared = [];
+      const formData = new FormData();
+      formData.append("description", description)
+      formData.append("file", file)
+      // formData.append("shared", shared)
 
-      dispatch(addUploads(upload))
+      dispatch(createUploadAsync(formData))
 
       setDescription("");
       setFile(null);

@@ -5,6 +5,9 @@ const cookieParser = require('cookie-parser')
 
 const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
+const chatRouter = require("./routes/chat");
+const uploadsRouter = require("./routes/uploads");
+const sharedUploadsRouter = require("./routes/sharedUploads");
 
 const PORT = process.env.PORT || 8080
 
@@ -18,9 +21,13 @@ var corsOptions = {
 
 server.use(cors(corsOptions));
 server.use(express.json());
+server.use(express.static("public"));
 server.use(cookieParser());
 server.use("/auth", authRouter.router);
 server.use("/users", userRouter.router);
+server.use("/chats", chatRouter.router);
+server.use("/uploads", uploadsRouter.router);
+server.use("/shareduploads", sharedUploadsRouter.router);
 
 main().catch((err) => console.log(err));
 
