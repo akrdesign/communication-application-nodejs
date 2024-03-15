@@ -61,21 +61,9 @@ export const uploadSlice = createSlice({
   name: "uploads",
   initialState,
   reducers: {
-    // deleteUpload: (state, action) => {
-    //   const index = state.uploads.findIndex((d) => d.id === action.payload.id);
-    //   state.uploads.splice(index, 1);
-    // },
     resetFetchedUpload: (state, action) => {
       state.fetchedUpload = null
     },
-    // updateUpload: (state, action) => {
-    //   const {description, uploadIndex} = action.payload;
-    //   const updatedUploads = [...state.uploads];
-    //   updatedUploads[uploadIndex].description = description;
-    // },
-    addShareUpload: (state, action) => {
-      state.uploads = action.payload
-    }
   },
   extraReducers: (builder) => {
     builder
@@ -143,7 +131,7 @@ export const uploadSlice = createSlice({
   }
 });
 
-export const { addShareUpload, resetFetchedUpload } = uploadSlice.actions;
+export const { resetFetchedUpload } = uploadSlice.actions;
 export const fetchAllUploads = (state) => state.uploads.uploads;
 export const getSharedUploads = (state) => state.uploads.sharedUploads;
 export const getFetchedUpload = (state) => state.uploads.fetchedUpload;

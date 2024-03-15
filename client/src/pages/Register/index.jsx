@@ -10,7 +10,7 @@ import Button from "../../components/common/Button";
 import { emailRegex } from "../../utils/index";
 
 import styles from "./styles.module.scss";
-import { createUserAsync, selectAuthErrors } from "../../redux/auth/authSlice";
+import { clearAuthErrors, createUserAsync, selectAuthErrors } from "../../redux/auth/authSlice";
 
 const Register = () => {
   const [fullName, setFullName] = useState("");
@@ -27,7 +27,6 @@ const Register = () => {
 
   useEffect(() => {
     // Check for authError changes
-    console.log("authError", authError);
     if (authError) {
       // Update the local state errors to display error messages
       setErrors({
@@ -46,6 +45,13 @@ const Register = () => {
       }
     }
   }, [authError]); 
+
+  useEffect(() => {
+    return () => {
+      setFormSubmitted(false);
+      dispatch(clearAuthErrors())
+    };
+  }, []);
 
   const validateForm = () => {
     const errors = {};
@@ -77,7 +83,6 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formErrors = validateForm();
-    console.log(formErrors);
 
     if (Object.keys(formErrors).length === 0) {
       const userObj = {

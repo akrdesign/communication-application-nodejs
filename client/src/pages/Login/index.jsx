@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 import { emailRegex } from "../../utils/index";
@@ -7,7 +7,7 @@ import Button from "../../components/common/Button";
 
 import styles from "./styles.module.scss";
 import { useDispatch, useSelector } from "react-redux";
-import { checkUserAsync, selectAuthErrors, selectLoggedInUser } from "../../redux/auth/authSlice";
+import { checkUserAsync, clearAuthErrors, selectAuthErrors, selectLoggedInUser } from "../../redux/auth/authSlice";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -16,6 +16,12 @@ const Login = () => {
   const loginError = useSelector(selectAuthErrors);
   const loggedInUser = useSelector(selectLoggedInUser);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearAuthErrors())
+    };
+  }, []);
 
   const validateForm = () => {
     const errors = {};

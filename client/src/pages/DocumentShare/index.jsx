@@ -11,7 +11,6 @@ import styles from "./styles.module.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { allUsers } from "../../redux/users/usersSlice";
 import {
-  addShareUpload,
   createSharedUploadAsync,
   deleteSharedUploadAsync,
   fetchAllUploads,
